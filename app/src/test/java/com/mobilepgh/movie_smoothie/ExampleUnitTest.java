@@ -1,4 +1,4 @@
-package com.example.android.movie_smoothie;
+package com.mobilepgh.movie_smoothie;
 
 import org.junit.Test;
 

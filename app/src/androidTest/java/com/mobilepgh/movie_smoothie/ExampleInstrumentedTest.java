@@ -1,4 +1,4 @@
-package com.example.android.movie_smoothie;
+package com.mobilepgh.movie_smoothie;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

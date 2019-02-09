@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.example.android.movie_smoothie"
+        applicationId "com.mobilepgh.movie_smoothie"
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
@@ -23,6 +23,9 @@ repositories {
 }
 
 dependencies {
+    //v7 is library type - 28 is library version
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation  'com.android.support:exifinterface:28.0.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
