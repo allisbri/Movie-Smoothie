@@ -13,11 +13,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
+public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>
+implements View.OnClickListener {
     private static final String TAG = "MovieAdapter";
 
     private ArrayList<String> mPosterUrls = new ArrayList<>();
@@ -42,15 +44,28 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
         Log.d(TAG, "onBindViewHolder: called.");
-        Picasso
+        /*Picasso
                 .get()
                 .load(mPosterUrls.get(i))
+                .fit()
+                .centerInside()
+                .into(viewHolder.poster);*/
+        Glide.with(mContext)
+                .asBitmap()
+                .load(mPosterUrls.get(i))
                 .into(viewHolder.poster);
+        viewHolder.parent.setOnClickListener(onClick());
+
     }
 
     @Override
     public int getItemCount() {
         return mPosterUrls.size();
+    }
+
+    @Override
+    public void onClick(View v) {
+        Toast.makeText(mContext, "clicked " + v.getId(), Toast.LENGTH_SHORT).show();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -60,6 +75,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            itemView.setPadding(0,0,0,0);
             poster = itemView.findViewById(R.id.iv_item_number);
             parent = itemView.findViewById(R.id.ll_item_parent);
 
