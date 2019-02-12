@@ -18,16 +18,21 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>
-implements View.OnClickListener {
+public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
     private static final String TAG = "MovieAdapter";
 
     private ArrayList<String> mPosterUrls = new ArrayList<>();
     private Context mContext;
+    private MovieAdapterClickHandler mClickHandler;
 
-    public MovieAdapter(ArrayList<String> mPosters, Context mContext) {
+    public MovieAdapter(ArrayList<String> mPosters, Context mContext, MovieAdapterClickHandler handler) {
         this.mPosterUrls = mPosters;
         this.mContext = mContext;
+        this.mClickHandler = handler;
+    }
+
+    public interface MovieAdapterClickHandler{
+        public void onClick(String movieDetails);
     }
 
     //place view holder
@@ -54,7 +59,7 @@ implements View.OnClickListener {
                 .asBitmap()
                 .load(mPosterUrls.get(i))
                 .into(viewHolder.poster);
-        viewHolder.parent.setOnClickListener(onClick());
+
 
     }
 
@@ -63,12 +68,8 @@ implements View.OnClickListener {
         return mPosterUrls.size();
     }
 
-    @Override
-    public void onClick(View v) {
-        Toast.makeText(mContext, "clicked " + v.getId(), Toast.LENGTH_SHORT).show();
-    }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView poster;
         LinearLayout parent;
@@ -78,8 +79,14 @@ implements View.OnClickListener {
             itemView.setPadding(0,0,0,0);
             poster = itemView.findViewById(R.id.iv_item_number);
             parent = itemView.findViewById(R.id.ll_item_parent);
+            itemView.setOnClickListener(this);
 
         }
 
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(mContext, "clicked " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
+            mClickHandler.onClick("movieDetails: " + getAdapterPosition());
+        }
     }
 }
