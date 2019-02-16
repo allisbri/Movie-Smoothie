@@ -2,6 +2,7 @@ package com.mobilepgh.movie_smoothie;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mobilepgh.movie_smoothie.utilities.NetworkUtils;
+
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -35,6 +40,7 @@ public class MainActivity extends AppCompatActivity
             urls.add("https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
         }
         initRecyclerView();
+        new MovieDataQuery().execute(NetworkUtils.buildURL());
     }
 
     private void initRecyclerView(){
@@ -45,6 +51,7 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setAdapter(movieAdapter);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         //recyclerView.addItemDecoration(itemDecorator);
+
     }
 
 
@@ -55,6 +62,30 @@ public class MainActivity extends AppCompatActivity
         Intent intentToStartDetailActivity = new Intent(context, detailActivityClass);
         intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, movieDetails);
         startActivity(intentToStartDetailActivity);
+    }
+
+
+    public class MovieDataQuery extends AsyncTask<URL, Void, String> {
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.d(TAG, "doInBackground: " + s);
+        }
+
+        //starts new thread
+        @Override
+        protected String doInBackground(URL...urls) {
+            String movieData = null;
+            URL url = urls[0];
+            try {
+                movieData = NetworkUtils.getResponseFromHttpUrl(url);
+
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+            return movieData;
+        }
     }
 }
 
