@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     private int pageNum = 1;
 
-    private ArrayList<String> urls = new ArrayList<>();
+    private ArrayList<Poster> posters = new ArrayList<>();
 
 
     private boolean isLoading = true;
@@ -46,24 +46,18 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: ");
-        for (int i = 0; i < 10; i++) {
-            urls.add("https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
-        }
         new MovieDataQuery().execute(NetworkUtils.buildURL());
-        initRecyclerView();
-
-
-
     }
 
     private void initRecyclerView(){
         //DividerItemDecoration itemDecorator = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         //itemDecorator.setDrawable(ContextCompat.getDrawable(this, R.drawable.divider));
         RecyclerView recyclerView = findViewById(R.id.rv_posters);
-        MovieAdapter movieAdapter = new MovieAdapter(urls, this, this);
+        MovieAdapter movieAdapter = new MovieAdapter(posters, MainActivity.this, MainActivity.this);
         recyclerView.setAdapter(movieAdapter);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         //recyclerView.addItemDecoration(itemDecorator);
+
 
     }
 
@@ -83,9 +77,10 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             Log.d(TAG, "doInBackground: " + s);
-            ArrayList<Poster> posters = NetworkUtils.parseJSONPosterData(s);
+            posters = NetworkUtils.parseJSONPosterData(s);
             Log.d(TAG, "test1" + posters.get(0).getPath());
             Log.d(TAG, Integer.toString(posters.get(0).getId()));
+            initRecyclerView();
         }
 
         //starts new thread

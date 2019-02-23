@@ -1,6 +1,7 @@
 package com.mobilepgh.movie_smoothie.utilities;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.mobilepgh.movie_smoothie.Poster;
 
@@ -16,6 +17,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import static com.android.volley.VolleyLog.TAG;
 
 public class NetworkUtils {
     private static String baseURL = "https://api.themoviedb.org/3/movie/";
@@ -93,14 +96,16 @@ public class NetworkUtils {
             JSONObject fullResponse = new JSONObject(JSONstring);
             JSONArray results = fullResponse.getJSONArray("results");
             ArrayList<Poster> posters = new ArrayList<Poster>();
+            Log.d(TAG, "parseJSONPosterData: " + results.length());
             for (int i = 0; i < results.length(); i++) {
                 JSONObject movie = results.getJSONObject(i);
                 String id = movie.getString("id");
+                Log.d(TAG, "parseJSONPosterData: " + id + " " + i);
                 String posterPath = movie.getString("poster_path");
                 Poster poster = new Poster(Integer.parseInt(id), posterPath);
                 posters.add(poster);
-                return posters;
             }
+            return posters;
         }
         catch(JSONException e){
             e.printStackTrace();
