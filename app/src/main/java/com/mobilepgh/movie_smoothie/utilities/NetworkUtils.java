@@ -2,11 +2,19 @@ package com.mobilepgh.movie_smoothie.utilities;
 
 import android.net.Uri;
 
+import com.mobilepgh.movie_smoothie.Poster;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class NetworkUtils {
@@ -14,6 +22,7 @@ public class NetworkUtils {
     private static String APIkey;
 
     private static String sortBy = "popular";
+
     public enum SortOrder{
         NEW("new"),
         POPULAR("popular"),
@@ -65,6 +74,40 @@ public class NetworkUtils {
                 urlConnection.disconnect();
         }
     }
+
+    public static int parseJSONPageData(String JSONstring){
+        int pageTotal = 0;
+        try{
+            JSONObject fullResponse = new JSONObject(JSONstring);
+            String totalPages = fullResponse.getString("total_pages");
+            pageTotal = Integer.parseInt(totalPages);
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+        return pageTotal;
+    }
+
+    public static ArrayList<Poster> parseJSONPosterData(String JSONstring){
+        try{
+            JSONObject fullResponse = new JSONObject(JSONstring);
+            JSONArray results = fullResponse.getJSONArray("results");
+            ArrayList<Poster> posters = new ArrayList<Poster>();
+            for (int i = 0; i < results.length(); i++) {
+                JSONObject movie = results.getJSONObject(i);
+                String id = movie.getString("id");
+                String posterPath = movie.getString("poster_path");
+                Poster poster = new Poster(Integer.parseInt(id), posterPath);
+                posters.add(poster);
+                return posters;
+            }
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
 
 

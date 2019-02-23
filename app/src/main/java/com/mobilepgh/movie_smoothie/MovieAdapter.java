@@ -21,18 +21,19 @@ import java.util.ArrayList;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
     private static final String TAG = "MovieAdapter";
 
-    private ArrayList<String> mPosterUrls = new ArrayList<>();
+    private ArrayList<Poster> posters;
     private Context mContext;
     private MovieAdapterClickHandler mClickHandler;
+    private String baseURL = "http://image.tmdb.org/t/p/w185";
 
-    public MovieAdapter(ArrayList<String> mPosters, Context mContext, MovieAdapterClickHandler handler) {
-        this.mPosterUrls = mPosters;
+    public MovieAdapter(ArrayList<Poster> mPosters, Context mContext, MovieAdapterClickHandler handler) {
+        this.posters = mPosters;
         this.mContext = mContext;
         this.mClickHandler = handler;
     }
 
     public interface MovieAdapterClickHandler{
-        public void onClick(String movieDetails);
+        void onClick(String movieDetails);
     }
 
     //place view holder
@@ -57,7 +58,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
                 .into(viewHolder.poster);*/
         Glide.with(mContext)
                 .asBitmap()
-                .load(mPosterUrls.get(i))
+                .load(baseURL + posters.get(i).getPath())
                 .into(viewHolder.poster);
 
 
@@ -65,7 +66,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return mPosterUrls.size();
+        return posters.size();
     }
 
 
@@ -73,6 +74,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
         ImageView poster;
         LinearLayout parent;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -88,5 +90,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             Toast.makeText(mContext, "clicked " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
             mClickHandler.onClick("movieDetails: " + getAdapterPosition());
         }
+    }
+
+    public void addPosters(ArrayList<Poster> morePosters){
+        for (Poster p : morePosters){
+            posters.add(p);
+        }
+        notifyDataSetChanged();
     }
 }

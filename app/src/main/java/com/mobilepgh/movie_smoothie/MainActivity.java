@@ -28,8 +28,18 @@ public class MainActivity extends AppCompatActivity
         implements MovieAdapter.MovieAdapterClickHandler {
 
     private static final String TAG = "MainActivity";
+    private int pageNum = 1;
 
     private ArrayList<String> urls = new ArrayList<>();
+
+
+    private boolean isLoading = true;
+    private int pastVisItems,
+            visibleItems,
+            totalItems,
+            previousTotal = 0;
+
+    private int viewThreshold = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +49,11 @@ public class MainActivity extends AppCompatActivity
         for (int i = 0; i < 10; i++) {
             urls.add("https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
         }
-        initRecyclerView();
         new MovieDataQuery().execute(NetworkUtils.buildURL());
+        initRecyclerView();
+
+
+
     }
 
     private void initRecyclerView(){
@@ -53,7 +66,6 @@ public class MainActivity extends AppCompatActivity
         //recyclerView.addItemDecoration(itemDecorator);
 
     }
-
 
     @Override
     public void onClick(String movieDetails) {
@@ -71,6 +83,9 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             Log.d(TAG, "doInBackground: " + s);
+            ArrayList<Poster> posters = NetworkUtils.parseJSONPosterData(s);
+            Log.d(TAG, "test1" + posters.get(0).getPath());
+            Log.d(TAG, Integer.toString(posters.get(0).getId()));
         }
 
         //starts new thread
@@ -81,11 +96,16 @@ public class MainActivity extends AppCompatActivity
             try {
                 movieData = NetworkUtils.getResponseFromHttpUrl(url);
 
+
             } catch (IOException e){
                 e.printStackTrace();
             }
             return movieData;
         }
+    }
+
+    private void doPagination(){
+
     }
 }
 
