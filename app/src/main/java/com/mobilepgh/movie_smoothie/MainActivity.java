@@ -3,6 +3,7 @@ package com.mobilepgh.movie_smoothie;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,36 +30,69 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "MainActivity";
     private int pageNum = 1;
-
-    private ArrayList<Poster> posters = new ArrayList<>();
-
-
+    private NetworkUtils.SortOrder sortOrder = NetworkUtils.SortOrder.popular;
+    private ArrayList<Poster> posters;
     private boolean isLoading = true;
-    private int pastVisItems,
-            visibleItems,
-            totalItems,
-            previousTotal = 0;
-
-    private int viewThreshold = 0;
-
+    private int firstVisibleItemNumber,
+    visibleItemCount,
+    previousTotal,
+    totalItemCount = 0;
+    private int pageNumber = 1;
+    private MovieAdapter movieAdapter;
+    //min number to load off screen
+    private int viewThreshold = 30;
+    private GridLayoutManager layoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: ");
-        new MovieDataQuery().execute(NetworkUtils.buildURL());
+        layoutManager = new GridLayoutManager(this, 2);
+        layoutManager.setReverseLayout(false);
+        posters = new ArrayList<>();
+        initRecyclerView();
+        new MovieDataQuery().execute(NetworkUtils.buildURL(pageNumber, sortOrder));
     }
 
     private void initRecyclerView(){
         //DividerItemDecoration itemDecorator = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         //itemDecorator.setDrawable(ContextCompat.getDrawable(this, R.drawable.divider));
         RecyclerView recyclerView = findViewById(R.id.rv_posters);
-        MovieAdapter movieAdapter = new MovieAdapter(posters, MainActivity.this, MainActivity.this);
+        movieAdapter = new MovieAdapter(posters, this, this);
         recyclerView.setAdapter(movieAdapter);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        //recyclerView.addItemDecoration(itemDecorator);
+        recyclerView.setLayoutManager(layoutManager);
+        setOnScrollListener(recyclerView);
+    }
 
+    public void setOnScrollListener(RecyclerView rv) {
+        rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                //total items loaded
+                totalItemCount = layoutManager.getItemCount();
+                //number of first visible item on screen
+                firstVisibleItemNumber = layoutManager.findFirstVisibleItemPosition();
+                //total items visible on screen
+                visibleItemCount = layoutManager.getChildCount();
 
+                //load more on scroll only if not already loading more
+                if (dy > 0) {
+                    if (!isLoading) {
+                        //load if scroll has reached a point close to or equal to the totalItemCount
+                        if ((totalItemCount) <= (viewThreshold + firstVisibleItemNumber + visibleItemCount)) {
+                            pageNum++;
+                            new MovieDataQuery().execute(NetworkUtils.buildURL(pageNum, sortOrder));
+                            isLoading = true;
+                        }
+                    }
+                    if (isLoading && (totalItemCount > previousTotal)) {
+                        isLoading = false;
+                        previousTotal = totalItemCount;
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -72,15 +106,13 @@ public class MainActivity extends AppCompatActivity
 
 
     public class MovieDataQuery extends AsyncTask<URL, Void, String> {
-
+        ArrayList<Poster> newPosters = new ArrayList<>();
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Log.d(TAG, "doInBackground: " + s);
-            posters = NetworkUtils.parseJSONPosterData(s);
-            Log.d(TAG, "test1" + posters.get(0).getPath());
-            Log.d(TAG, Integer.toString(posters.get(0).getId()));
-            initRecyclerView();
+            newPosters = NetworkUtils.parseJSONPosterData(s);
+            movieAdapter.addPosters(newPosters);
+
         }
 
         //starts new thread
@@ -90,31 +122,13 @@ public class MainActivity extends AppCompatActivity
             URL url = urls[0];
             try {
                 movieData = NetworkUtils.getResponseFromHttpUrl(url);
-
-
             } catch (IOException e){
                 e.printStackTrace();
             }
             return movieData;
         }
     }
-
-    private void doPagination(){
-
-    }
 }
 
-//front page grid arrangement of movie posters
-    //viewholders/adapter
-
-//get movies by async request
-
-//movie class
-    //ratings
-    //popularity
-    //title
-    //plot synopsis
-    //user rating
-    //release date
 
 

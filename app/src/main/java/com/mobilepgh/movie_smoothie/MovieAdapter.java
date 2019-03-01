@@ -2,7 +2,9 @@ package com.mobilepgh.movie_smoothie;
 
 import android.content.Context;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,7 +59,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
                 .centerInside()
                 .into(viewHolder.poster);*/
         Glide.with(mContext)
-                .asBitmap()
+                //.asBitmap()
                 .load(baseURL + posters.get(i).getPath())
                 .into(viewHolder.poster);
 

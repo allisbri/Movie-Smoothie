@@ -23,31 +23,28 @@ import static com.android.volley.VolleyLog.TAG;
 public class NetworkUtils {
     private static String baseURL = "https://api.themoviedb.org/3/movie/";
     private static String APIkey;
-
-    private static String sortBy = "popular";
+    //private static String sortBy = "popular";
 
     public enum SortOrder{
-        NEW("new"),
-        POPULAR("popular"),
+        NOW_PLAYING("now_playing"),
+        popular("popular"),
         TOP_RATED("top_rated");
         private String sortOrder;
 
         SortOrder(String s){
             sortOrder = s;
         }
-        public String getSortOrder(){
-            return sortOrder;
-        }
     }
 
-    public NetworkUtils(SortOrder sortOrder){
-        sortBy = sortOrder.getSortOrder();
+    public NetworkUtils(){
 
     }
 
-    public static URL buildURL(){
+    public static URL buildURL(int pageNumber, SortOrder sortBy){
+        String pageNumberString = Integer.toString(pageNumber);
         Uri builtUri = Uri.parse(baseURL + sortBy).buildUpon()
             .appendQueryParameter("api_key", APIkey)
+                .appendQueryParameter("page", pageNumberString)
                 .build();
 
         URL url = null;
@@ -57,6 +54,7 @@ public class NetworkUtils {
         } catch (MalformedURLException e){
             e.printStackTrace();
         }
+        Log.d(TAG, "buildURL: " + url.toString());
         return url;
     }
 
@@ -78,7 +76,7 @@ public class NetworkUtils {
         }
     }
 
-    public static int parseJSONPageData(String JSONstring){
+    public int parseJSONPageData(String JSONstring){
         int pageTotal = 0;
         try{
             JSONObject fullResponse = new JSONObject(JSONstring);
