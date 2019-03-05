@@ -1,35 +1,35 @@
 package com.mobilepgh.movie_smoothie.utilities;
 
 import android.net.Uri;
-import android.util.Log;
-
-import com.mobilepgh.movie_smoothie.Poster;
-
+import com.mobilepgh.movie_smoothie.entities.Movie;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Scanner;
-
-import static com.android.volley.VolleyLog.TAG;
 
 public class NetworkUtils {
     private static String baseURL = "https://api.themoviedb.org/3/movie/";
     private static String APIkey;
-    //private static String sortBy = "popular";
 
     public enum SortOrder{
         NOW_PLAYING("now_playing"),
-        popular("popular"),
+        POPULAR("popular"),
         TOP_RATED("top_rated");
         private String sortOrder;
+
+        public String getSortOrder() {
+            return sortOrder;
+        }
 
         SortOrder(String s){
             sortOrder = s;
@@ -40,10 +40,11 @@ public class NetworkUtils {
 
     }
 
-    public static URL buildURL(int pageNumber, SortOrder sortBy){
+    public static URL buildMovieListURL(int pageNumber, SortOrder sortBy){
         String pageNumberString = Integer.toString(pageNumber);
-        Uri builtUri = Uri.parse(baseURL + sortBy).buildUpon()
-            .appendQueryParameter("api_key", APIkey)
+        Uri builtUri = Uri.parse(baseURL).buildUpon()
+                .appendPath(sortBy.getSortOrder())
+                .appendQueryParameter("api_key", APIkey)
                 .appendQueryParameter("page", pageNumberString)
                 .build();
 
@@ -54,7 +55,22 @@ public class NetworkUtils {
         } catch (MalformedURLException e){
             e.printStackTrace();
         }
-        Log.d(TAG, "buildURL: " + url.toString());
+        return url;
+    }
+
+    public static URL buildMovieDetailsURL(int movieId){
+        Uri builtUri = Uri.parse(baseURL).buildUpon()
+                .appendQueryParameter("api_key", APIkey)
+                .appendPath(Integer.toString(movieId))
+                .build();
+
+        URL url = null;
+
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e){
+            e.printStackTrace();
+        }
         return url;
     }
 
@@ -89,21 +105,21 @@ public class NetworkUtils {
         return pageTotal;
     }
 
-    public static ArrayList<Poster> parseJSONPosterData(String JSONstring){
+    public static ArrayList<Movie> parseJSONMoviePosterData(String JSONstring){
         try{
             JSONObject fullResponse = new JSONObject(JSONstring);
             JSONArray results = fullResponse.getJSONArray("results");
-            ArrayList<Poster> posters = new ArrayList<Poster>();
-            Log.d(TAG, "parseJSONPosterData: " + results.length());
+            ArrayList<Movie> movies = new ArrayList<>();
             for (int i = 0; i < results.length(); i++) {
-                JSONObject movie = results.getJSONObject(i);
-                String id = movie.getString("id");
-                Log.d(TAG, "parseJSONPosterData: " + id + " " + i);
-                String posterPath = movie.getString("poster_path");
-                Poster poster = new Poster(Integer.parseInt(id), posterPath);
-                posters.add(poster);
+                JSONObject movieJSONObject = results.getJSONObject(i);
+                String id = movieJSONObject.getString("id");
+                String posterPath = movieJSONObject.getString("poster_path");
+                Movie movie = new Movie();
+                movie.setId(Integer.parseInt(id));
+                movie.setPosterPath(posterPath);
+                movies.add(movie);
             }
-            return posters;
+            return movies;
         }
         catch(JSONException e){
             e.printStackTrace();
@@ -111,6 +127,40 @@ public class NetworkUtils {
         return null;
     }
 
+    public static Movie parseJSONMovieDetailsData(String JSONstring){
+        try{
+            Movie movie = new Movie();
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+            JSONObject movieJSONObject = new JSONObject(JSONstring);
+            String stringId = movieJSONObject.getString("id");
+            String posterPath = movieJSONObject.getString("poster_path");
+            String title = movieJSONObject.getString("original_title");
+            String plot = movieJSONObject.getString("overview");
+            String releaseDateString = movieJSONObject.getString("release_date");
+            double rating = Double.parseDouble(movieJSONObject.getString("vote_average"));
+            movie.setId(Integer.parseInt(stringId));
+            movie.setPosterPath(posterPath);
+            movie.setTitle(title);
+            movie.setPlot(plot);
+            movie.setRating(rating);
+            try {
+                Date releaseDate = dateFormat.parse(releaseDateString);
+                movie.setReleaseDate(releaseDate);
+            }
+            catch(ParseException e){
+                e.printStackTrace();
+            }
+
+
+
+            return movie;
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
 
 

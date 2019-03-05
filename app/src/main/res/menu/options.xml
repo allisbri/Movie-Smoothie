@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="@string/popular_sort_option"
+        android:orderInCategory="1"
+        android:id="@+id/popular_sort"/>
+    <item
+        android:title="@string/now_playing_sort_option"
+        android:orderInCategory="2"
+        android:id="@+id/now_playing_sort"/>
+    <item
+        android:title="@string/top_rated_sort_option"
+        android:orderInCategory="3"
+        android:id="@+id/top_rated_sort"/>
+</menu>

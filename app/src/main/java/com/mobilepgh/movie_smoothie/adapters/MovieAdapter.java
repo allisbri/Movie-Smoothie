@@ -1,37 +1,33 @@
-package com.mobilepgh.movie_smoothie;
+package com.mobilepgh.movie_smoothie.adapters;
 
 import android.content.Context;
-import android.media.Image;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
+import com.mobilepgh.movie_smoothie.R;
+import com.mobilepgh.movie_smoothie.entities.Movie;
 
 import java.util.ArrayList;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
     private static final String TAG = "MovieAdapter";
 
-    private ArrayList<Poster> posters;
-    private Context mContext;
-    private MovieAdapterClickHandler mClickHandler;
+    private ArrayList<Movie> movies;
+    private Context context;
+    private MovieAdapterClickHandler clickHandler;
     private String baseURL = "http://image.tmdb.org/t/p/w185";
 
-    public MovieAdapter(ArrayList<Poster> mPosters, Context mContext, MovieAdapterClickHandler handler) {
-        this.posters = mPosters;
-        this.mContext = mContext;
-        this.mClickHandler = handler;
+    public MovieAdapter(ArrayList<Movie> movies, Context context, MovieAdapterClickHandler handler) {
+        this.movies = movies;
+        this.clickHandler = handler;
+        this.context = context;
     }
 
     public interface MovieAdapterClickHandler{
@@ -51,24 +47,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     //insert data in viewholder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
-        Log.d(TAG, "onBindViewHolder: called.");
-        /*Picasso
-                .get()
-                .load(mPosterUrls.get(i))
-                .fit()
-                .centerInside()
-                .into(viewHolder.poster);*/
-        Glide.with(mContext)
+        Glide.with(context)
                 //.asBitmap()
-                .load(baseURL + posters.get(i).getPath())
+                .load(baseURL + movies.get(i).getPosterPath())
                 .into(viewHolder.poster);
-
-
     }
 
     @Override
     public int getItemCount() {
-        return posters.size();
+        return movies.size();
     }
 
 
@@ -89,15 +76,21 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(mContext, "clicked " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
-            mClickHandler.onClick("movieDetails: " + getAdapterPosition());
+            Movie movie = movies.get(getAdapterPosition());
+            int id = movie.getId();
+            Toast.makeText(context, "clicked " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
+            clickHandler.onClick(Integer.toString(id));
         }
     }
 
-    public void addPosters(ArrayList<Poster> morePosters){
-        for (Poster p : morePosters){
-            posters.add(p);
+    public void addMovies(ArrayList<Movie> moreMovies){
+        for (Movie m : moreMovies){
+            movies.add(m);
         }
         notifyDataSetChanged();
+    }
+
+    public void clearMovies(){
+        movies = new ArrayList<>();
     }
 }
