@@ -26,19 +26,22 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements MovieAdapter.MovieAdapterClickHandler {
     private RecyclerView recyclerView;
+    private GridLayoutManager layoutManager;
+    private ProgressBar loadingIndicator;
+    private TextView tvError;
     private static final String TAG = "MainActivity";
-    private int pageNum = 1;
+
     private ArrayList<Movie> movies;
     private boolean isLoading = true;
     private int firstVisibleItemNumber, visibleItemCount,
                 previousTotal, totalItemCount = 0;
+    private int viewThreshold = 30;
+    private int pageNum = 1;
+
     private NetworkUtils.SortOrder sortOrder;
     private MovieAdapter movieAdapter;
     //min number to load off screen
-    private int viewThreshold = 30;
-    private GridLayoutManager layoutManager;
-    private ProgressBar loadingIndicator;
-    private TextView tvError;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +76,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.top_rated_sort:
                 sortOrder = NetworkUtils.SortOrder.TOP_RATED;
                 break;
+            case R.id.credits_item:
+                openCredits();
+                break;
+
         }
         //Log.d(TAG, "onOptionsItemSelected: " + sortOrder.getSortOrder());
         updateGrid();
@@ -158,13 +165,19 @@ public class MainActivity extends AppCompatActivity
         startActivity(intentToStartDetailActivity);
     }
 
+    public void openCredits(){
+        Context context = this;
+        Class creditsActivityClass = CreditsActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, creditsActivityClass);
+        startActivity(intentToStartDetailActivity);
+    }
 
     public class MovieDataQuery extends AsyncTask<URL, Void, String> {
         ArrayList<Movie> newMovies = new ArrayList<>();
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if (s.equals("")) {
+            if (s == null || s.equals("")) {
                 loadingIndicator.setVisibility(View.INVISIBLE);
                 showError();
             }

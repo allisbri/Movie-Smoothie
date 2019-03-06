@@ -78,7 +78,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         public void onClick(View v) {
             Movie movie = movies.get(getAdapterPosition());
             int id = movie.getId();
-            Toast.makeText(context, "clicked " + getAdapterPosition(), Toast.LENGTH_SHORT).show();
             clickHandler.onClick(Integer.toString(id));
         }
     }

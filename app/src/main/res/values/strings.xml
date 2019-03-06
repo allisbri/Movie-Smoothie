@@ -3,9 +3,10 @@
     <string name="popular_sort_option">Popular</string>
     <string name="now_playing_sort_option">Now Playing</string>
     <string name="top_rated_sort_option">Top Rated</string>
-    <string name="api_key">d70298b4ce807a423b251f1e0411314e</string>
-    <string name="movie_url">https://api.themoviedb.org/3/movie/</string>
+    <string name="credits_option">Credits</string>
     <string name="connection_error">Error, unable to connect to server</string>
-
+    <string name="credit_string">This product uses the TMDb API but is not endorsed or certified by TMDb.</string>
+    <string name="credit_iv_description">MovieDB logo</string>
+    <string name="poster_iv_description">Movie poster</string>
 
 </resources>
