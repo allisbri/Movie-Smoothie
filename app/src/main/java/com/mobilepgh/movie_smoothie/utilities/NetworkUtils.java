@@ -1,6 +1,9 @@
 package com.mobilepgh.movie_smoothie.utilities;
 
+import android.content.Context;
 import android.net.Uri;
+
+import com.mobilepgh.movie_smoothie.R;
 import com.mobilepgh.movie_smoothie.entities.Movie;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,7 +22,6 @@ import java.util.Scanner;
 
 public class NetworkUtils {
     private static String baseURL = "https://api.themoviedb.org/3/movie/";
-    private static String APIkey;
 
     public enum SortOrder{
         NOW_PLAYING("now_playing"),
@@ -37,10 +39,9 @@ public class NetworkUtils {
     }
 
     public NetworkUtils(){
-
     }
 
-    public static URL buildMovieListURL(int pageNumber, SortOrder sortBy){
+    public static URL buildMovieListURL(String APIkey, int pageNumber, SortOrder sortBy){
         String pageNumberString = Integer.toString(pageNumber);
         Uri builtUri = Uri.parse(baseURL).buildUpon()
                 .appendPath(sortBy.getSortOrder())
@@ -58,7 +59,7 @@ public class NetworkUtils {
         return url;
     }
 
-    public static URL buildMovieDetailsURL(int movieId){
+    public static URL buildMovieDetailsURL(String APIkey, int movieId){
         Uri builtUri = Uri.parse(baseURL).buildUpon()
                 .appendQueryParameter("api_key", APIkey)
                 .appendPath(Integer.toString(movieId))

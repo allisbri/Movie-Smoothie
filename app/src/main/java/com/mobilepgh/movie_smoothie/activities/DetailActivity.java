@@ -76,7 +76,8 @@ public class DetailActivity extends AppCompatActivity {
 
     public void getMovieDetails(){
         loadingIndicator.setVisibility(View.VISIBLE);
-        URL url = NetworkUtils.buildMovieDetailsURL(movieId);
+        String APIKey = getString(R.string.movie_db_api_key);
+        URL url = NetworkUtils.buildMovieDetailsURL(APIKey, movieId);
         new MovieDataQuery().execute(url);
     }
 

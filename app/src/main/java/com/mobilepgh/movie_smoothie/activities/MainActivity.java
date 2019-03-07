@@ -103,7 +103,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateGrid(){
-        URL url = NetworkUtils.buildMovieListURL(pageNum, sortOrder);
+        String APIKey = getString(R.string.movie_db_api_key);
+        URL url = NetworkUtils.buildMovieListURL(APIKey, pageNum, sortOrder);
         loadingIndicator.setVisibility(View.VISIBLE);
         new MovieDataQuery().execute(url);
     }
