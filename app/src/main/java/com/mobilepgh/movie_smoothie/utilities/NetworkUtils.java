@@ -21,7 +21,7 @@ import java.util.Locale;
 import java.util.Scanner;
 
 public class NetworkUtils {
-    private static String baseURL = "https://api.themoviedb.org/3/movie/";
+    private static String baseURL = "http://api.themoviedb.org/3/movie/";
 
     public enum SortOrder{
         NOW_PLAYING("now_playing"),
